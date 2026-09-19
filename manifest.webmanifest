@@ -1,0 +1,42 @@
+{
+  "id": "/classroom/",
+  "name": "SRNR Learning Library",
+  "short_name": "Learning Library",
+  "description": "คลังการเรียนรู้ ห้องเรียน เนื้อหา ผลงาน Prompt และเครื่องมือ AI",
+  "lang": "th",
+  "dir": "ltr",
+  "start_url": "/classroom/?source=pwa",
+  "scope": "/classroom/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "background_color": "#eef7ff",
+  "theme_color": "#0b63f6",
+  "categories": [
+    "education",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/classroom/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/classroom/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/classroom/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

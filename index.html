@@ -1,125 +1,186 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
-
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b63f6">
+  <meta name="description" content="SRNR Learning Library — ห้องเรียน เนื้อหา ผลงาน Prompt และเครื่องมือ AI">
 
-  <meta charset="UTF-8">
+  <title>S Learning Library</title>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon-180.png">
 
-  <meta name="theme-color" content="#061b46">
+  <!-- iPhone / iPad -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Learning Library">
 
-  <title>ห้องสมุดสื่อการเรียนรู้</title>
-  <link rel="icon" type="image/png" href="favicon1.png">
   <style>
+    :root{--blue:#0b63f6;--ink:#15365f;--muted:#6f86a5}
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#eef7ff;
+      font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    #appFrame{position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff}
+    .splash{position:fixed;z-index:50;inset:0;display:grid;place-items:center;padding:24px;
+      background:radial-gradient(circle at 20% 12%,#d9f4ff,transparent 36%),
+      linear-gradient(180deg,#f8fbff,#edf6ff);transition:opacity .28s ease,visibility .28s ease}
+    .splash.hide{opacity:0;visibility:hidden}
+    .splash-card{text-align:center}
+    .splash img{width:104px;height:104px;border-radius:28px;
+      box-shadow:0 20px 48px rgba(37,111,205,.18)}
+    .splash h1{margin:18px 0 5px;color:var(--ink);font-size:21px}
+    .splash p{margin:0;color:var(--muted);font-size:12px}
+    .loader{width:34px;height:34px;margin:20px auto 0;border:4px solid #d8eaff;
+      border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    * {
-      box-sizing: border-box;
-    }
+    .install-btn{position:fixed;z-index:60;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));
+      display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.4);
+      border-radius:999px;padding:11px 15px;background:rgba(7,29,66,.92);color:#fff;
+      box-shadow:0 14px 38px rgba(0,28,72,.26);font-weight:800;font-size:12px;
+      backdrop-filter:blur(12px)}
+    .install-btn[hidden]{display:none}
 
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #f5f9ff;
-    }
+    .net-banner{position:fixed;z-index:61;left:50%;top:calc(10px + env(safe-area-inset-top));
+      transform:translateX(-50%);padding:8px 13px;border-radius:999px;background:#8c3f22;color:#fff;
+      font-size:11px;font-weight:800;box-shadow:0 10px 25px rgba(81,34,15,.2)}
+    .net-banner[hidden]{display:none}
 
-    .app-frame {
-      display: block;
-      width: 100%;
-      height: 100dvh;
-      border: 0;
-      background: #ffffff;
-    }
+    .install-help{position:fixed;z-index:80;inset:0;display:grid;place-items:end center;
+      padding:14px;background:rgba(5,21,48,.48);backdrop-filter:blur(6px)}
+    .install-help[hidden]{display:none}
+    .install-card{width:min(520px,100%);padding:22px;border-radius:25px;background:#fff;color:var(--ink);
+      box-shadow:0 32px 80px rgba(0,27,69,.34)}
+    .install-card h2{margin:0 36px 7px 0;font-size:20px}
+    .install-card p{color:var(--muted);line-height:1.7;font-size:12px}
+    .install-card ol{padding-left:22px;color:#405f82;line-height:1.85;font-size:12px}
+    .close{float:right;width:34px;height:34px;border:0;border-radius:50%;background:#eef5ff;color:#55708f;font-size:20px}
 
-    .loading {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-
-      display: grid;
-      place-items: center;
-
-      font-family:
-        "Noto Sans Thai",
-        "Leelawadee UI",
-        Tahoma,
-        sans-serif;
-
-      color: #0b63f6;
-      background:
-        radial-gradient(
-          circle at center,
-          #ffffff,
-          #eef6ff
-        );
-    }
-
-    .loading div {
-      text-align: center;
-    }
-
-    .loading .icon {
-      display: block;
-      font-size: 44px;
-      margin-bottom: 10px;
-    }
-
-    .loading strong {
-      display: block;
-      font-size: 18px;
-    }
-
-    .loading small {
-      display: block;
-      margin-top: 5px;
-      color: #6780a4;
-    }
-
+    @media(display-mode:standalone){.install-btn{display:none!important}}
   </style>
-
 </head>
-
-
 <body>
 
-  <div class="loading">
+  <!-- IMPORTANT:
+       วาง URL /exec ปัจจุบันของ Google Apps Script ใน APP_URL ด้านล่าง
+       ห้ามใช้ /dev สำหรับตัว Production
+  -->
+  <iframe id="appFrame" title="SRNR Learning Library" allow="clipboard-read; clipboard-write"></iframe>
 
-    <div>
-
-      <span class="icon">📚</span>
-
-      <strong>
-        ห้องสมุดสื่อการเรียนรู้
-      </strong>
-
-      <small>
-        กำลังเปิดระบบ...
-      </small>
-
+  <div class="splash" id="splash">
+    <div class="splash-card">
+      <img src="./icons/icon-192.png" alt="SRNR Learning Library">
+      <h1>SRNR Learning Library</h1>
+      <p>กำลังเตรียมห้องเรียนของคุณ...</p>
+      <div class="loader" aria-hidden="true"></div>
     </div>
-
   </div>
 
+  <div class="net-banner" id="networkBanner" hidden>ออฟไลน์ — รอการเชื่อมต่ออินเทอร์เน็ต</div>
 
-  <iframe
+  <button class="install-btn" id="installAppButton" type="button" hidden>
+    📱 <span>ติดตั้งแอป</span>
+  </button>
 
-    class="app-frame"
+  <div class="install-help" id="installHelp" hidden>
+    <section class="install-card">
+      <button class="close" id="closeInstallHelp" type="button" aria-label="ปิด">×</button>
+      <h2>ติดตั้ง SRNR Learning Library</h2>
 
-    src="https://script.google.com/macros/s/AKfycbw2tJstDvaL7m7cpILAPxM4ra7qCgTAtE5rsoHW9RPqezMzrAH8CdiECVj51cNiR8zV/exec"
+      <div id="iosInstallSteps" hidden>
+        <p>บน iPhone / iPad ให้เปิดหน้านี้ด้วย Safari แล้วทำตามนี้:</p>
+        <ol>
+          <li>กดปุ่ม <b>แชร์</b> ของ Safari</li>
+          <li>เลือก <b>เพิ่มไปยังหน้าจอโฮม</b></li>
+          <li>กด <b>เพิ่ม</b></li>
+        </ol>
+      </div>
 
-    title="ห้องสมุดสื่อการเรียนรู้"
+      <div id="genericInstallSteps">
+        <p>เปิดเมนูของ Browser แล้วเลือกคำสั่งประมาณ <b>Install app</b> หรือ <b>Add to Home screen</b> หากมีให้เลือก</p>
+      </div>
+    </section>
+  </div>
 
-    allow="fullscreen"
+  <script>
+    // ============================================================
+    // แก้เพียงบรรทัดนี้: คัดลอก URL /exec ปัจจุบันจาก index เดิม
+    // ============================================================
+    const APP_URL = 'https://script.google.com/macros/s/AKfycbw2tJstDvaL7m7cpILAPxM4ra7qCgTAtE5rsoHW9RPqezMzrAH8CdiECVj51cNiR8zV/exec';
 
-  ></iframe>
+    const frame = document.getElementById('appFrame');
+    const splash = document.getElementById('splash');
+    const banner = document.getElementById('networkBanner');
 
+    function validAppUrl() {
+      return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/i.test(APP_URL);
+    }
+
+    function showConfigError() {
+      splash.innerHTML = `
+        <div class="splash-card" style="max-width:520px;padding:28px;background:#fff;border-radius:28px;box-shadow:0 24px 70px rgba(20,75,150,.15)">
+          <img src="./icons/icon-192.png" alt="">
+          <h1>ยังไม่ได้ใส่ Apps Script URL</h1>
+          <p style="line-height:1.7">เปิดไฟล์ <b>index.html</b> แล้วแทนค่า <b>APP_URL</b> ด้วย URL <b>/exec</b> ตัวปัจจุบันของระบบ จากนั้น Commit ใหม่</p>
+        </div>`;
+    }
+
+    function loadApp() {
+      if (!validAppUrl()) {
+        showConfigError();
+        return;
+      }
+
+      if (!navigator.onLine) {
+        frame.src = './offline.html';
+        splash.classList.add('hide');
+        return;
+      }
+
+      frame.src = APP_URL;
+    }
+
+    frame.addEventListener('load', () => {
+      window.setTimeout(() => splash.classList.add('hide'), 220);
+    });
+
+    function updateNetworkState() {
+      const offline = !navigator.onLine;
+      banner.hidden = !offline;
+
+      if (!validAppUrl()) return;
+
+      if (offline) {
+        frame.src = './offline.html';
+        splash.classList.add('hide');
+      } else if (!frame.src || frame.src.endsWith('/offline.html')) {
+        splash.classList.remove('hide');
+        frame.src = APP_URL;
+      }
+    }
+
+    window.addEventListener('online', updateNetworkState);
+    window.addEventListener('offline', updateNetworkState);
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('./service-worker.js', { scope: './' })
+          .catch(error => console.warn('Service Worker:', error));
+      });
+    }
+
+    loadApp();
+
+    // กัน Splash ค้าง หาก Apps Script โหลดช้า
+    window.setTimeout(() => {
+      if (validAppUrl()) splash.classList.add('hide');
+    }, 8000);
+  </script>
+
+  <script src="./pwa-install.js"></script>
 </body>
-
 </html>
